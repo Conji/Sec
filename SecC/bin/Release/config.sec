@@ -3,11 +3,9 @@ address = test
 port = 80
 
 (server.config)
-
 port = 81
 
-(server.plugins) > server.config
-
+(server.plugins)
 SomeCoolPlugin
 AnotherCoolOne
 How about this?

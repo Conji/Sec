@@ -35,7 +35,7 @@ namespace Sec.Parser
             {
                 table = ReadTable(GetParentName(name), contents);
             }
-            foreach (var c in contents.Where(c => !c.StartsWith("--")))
+            foreach (var c in contents.Where(c => !c.StartsWith("--") || !c.StartsWith("#")))
             {
                 if (!reading)
                 {

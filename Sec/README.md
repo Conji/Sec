@@ -82,3 +82,38 @@ rmdir
 rmfile
 ```
 These can be accessed via `sec["commands"]`. The only values these can be are strings.
+
+A valid config.sec:
+```
+# configuration file for syhno
+
+(server)
+address = 192.168.1.10
+port = 25565
+motd = Server is up and running!
+max_players = 20
+whitelisted = false
+spawn_monsters = true
+
+# debugging configuration (cause things happen)
+(server.debug)
+motd = Server is running in DEBUG mode!
+max_players = 5
+whitelisted = true
+spawn_monsters = false
+
+(whitelist)
+Conji
+Daytdog
+Connorcpu
+
+message = You aren't allowed right now. Sorry :(
+
+(operators)
+Conji
+Daytdog
+Connorcpu
+
+true_op = true
+name_color = red
+```
