@@ -1,0 +1,10 @@
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Syhno.Core\Sec\Sec\bin\Release\Sec.dll
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Syhno.Core\Sec\Sec\bin\Release\Sec.pdb
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Syhno.Core\Sec\Sec\obj\Release\Sec.csprojResolveAssemblyReference.cache
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Syhno.Core\Sec\Sec\obj\Release\Sec.dll
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Syhno.Core\Sec\Sec\obj\Release\Sec.pdb
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Sec\Sec\bin\Release\Sec.dll
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Sec\Sec\bin\Release\Sec.pdb
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Sec\Sec\obj\Release\Sec.csprojResolveAssemblyReference.cache
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Sec\Sec\obj\Release\Sec.dll
+C:\Users\Justin\Documents\Visual Studio 2015\Projects\Sec\Sec\obj\Release\Sec.pdb
