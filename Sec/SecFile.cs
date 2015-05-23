@@ -23,11 +23,18 @@ namespace Sec
             
         }
 
+        public bool HasTables => true;
+
+        public void ReadTables()
+        {
+            Tables = SecReader.GetTables(File.ReadAllLines(_location));
+        }
+
         public SecTable this[string tableName] => Tables[tableName];
 
         public static SecFile Open(string location)
         {
-            return new SecFile(location) { Tables = SecReader.GetTables(File.ReadAllLines(location))};
+            return new SecFile(location) { Tables = SecReader.GetTables(File.ReadAllLines(location + SEC_EXT))};
         }
 
         public override string ToString()

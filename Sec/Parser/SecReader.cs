@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Sec.Parser
@@ -8,60 +9,14 @@ namespace Sec.Parser
     {
         public static Dictionary<string, SecTable> GetTables(string[] contents)
         {
-            var table = new Dictionary<string, SecTable>();
-            var n = "";
-            foreach (var line in contents.Where(line => !line.StartsWith("--")))
+            foreach (var nc in contents.Where(l => l.StartsWith("import ")).Select(line => File.ReadAllLines(GetImport(line))))
             {
-                if (line.StartsWith("import "))
-                {
-                    var sec = SecFile.Open(GetImport(line)).Tables;
-                    foreach (var s in sec)
-                    {
-                        table.Add(s.Key, s.Value);
-                    }
-                }
-                else if (line.StartsWith("("))
-                {
-                    var name = GetTableName(line);
-                    SecTable t;
-                    if (name.Contains(".") && table.ContainsKey(GetParentName(name)))
-                    {
-                        t = table[GetParentName(name)];
-                    }
-                    else
-                    {
-                        t = new SecTable(name);
-                    }
-                    table.Add(name, t);
-                    n = name;
-                }
-                else
-                {
-                    var type = GetType(line);
-                    var kn = GetKeyName(line);
-                    if (table[n].Data.ContainsKey(kn)) table[n].Data.Remove(kn);
-                    switch (type)
-                    {
-                        case SecType.Bool:
-                            table[n].Data.Add(kn, new SecBool(bool.Parse(line.Split('=')[1])));
-                            break;
-                        case SecType.Float:
-                            table[n].Data.Add(kn, new SecFloat(float.Parse(line.Split('=')[1])));
-                            break;
-                        case SecType.Int:
-                            table[n].Data.Add(kn, new SecInt(int.Parse(line.Split('=')[1])));
-                            break;
-                        case SecType.Keyless:
-                            table[n].KeylessData.Add(line.Trim());
-                            break;
-                        case SecType.String:
-                            table[n].Data.Add(kn, new SecString(line.Split('=')[1].Trim()));
-                            break;
-                    }
-                }
+                Array.Copy(nc, 0, contents, contents.Length, nc.Length);
             }
 
-            return table;
+            return contents.Where(line => line.StartsWith("("))
+                .Select(GetTableName)
+                .ToDictionary(name => name, name => ReadTable(name, contents));
         }
 
         public static string GetImport(string line)
@@ -70,6 +25,62 @@ namespace Sec.Parser
                 .Replace("import", "")
                 .Replace("'", "")
                 .Replace("\"", "");
+        }
+
+        public static SecTable ReadTable(string name, string[] contents)
+        {
+            var reading = false;
+            var table = new SecTable(name);
+            if (name.Contains("."))
+            {
+                table = ReadTable(GetParentName(name), contents);
+            }
+            foreach (var c in contents.Where(c => !c.StartsWith("--")))
+            {
+                if (!reading)
+                {
+                    if (c.StartsWith($"({name})"))
+                    {
+                        reading = true;
+                        if (c.Contains(">"))
+                        {
+                            foreach (var inht in GetInherits(c).Select(inh => ReadTable(inh, contents)))
+                            {
+                                table.KeylessData.AddRange(inht.KeylessData);
+                                foreach (var kvp in inht.Data)
+                                {
+                                    table.Data.Add(kvp.Key, kvp.Value);
+                                }
+                            }
+                        }
+                    }
+                    continue;
+                }
+                if (c.StartsWith("(")) break;
+                var type = GetType(c);
+                var kn = GetKeyName(c);
+                if (table.Data.ContainsKey(kn)) table.Data.Remove(kn);
+                switch (type)
+                {
+                    case SecType.Bool:
+                        table.Data.Add(kn, new SecBool(bool.Parse(c.Split('=')[1])));
+                        break;
+                    case SecType.Float:
+                        table.Data.Add(kn, new SecFloat(float.Parse(c.Split('=')[1])));
+                        break;
+                    case SecType.Int:
+                        table.Data.Add(kn, new SecInt(int.Parse(c.Split('=')[1])));
+                        break;
+                    case SecType.Keyless:
+                        table.KeylessData.Add(c.Trim());
+                        break;
+                    case SecType.String:
+                        table.Data.Add(kn, new SecString(c.Split('=')[1].Trim()));
+                        break;
+                }
+
+            }
+            return table;
         }
 
         public static SecType GetType(string s)
@@ -88,7 +99,7 @@ namespace Sec.Parser
 
         public static string GetTableName(string line)
         {
-            return line.Replace("(", "").Replace(")", "").Trim();
+            return line.Replace("(", "").Replace(")", "").Split('>')[0].Trim();
         }
 
         public static string GetParentName(string name)
@@ -97,6 +108,11 @@ namespace Sec.Parser
             if (name[0] == '.' || name.Last() == '.') throw new ArgumentException("Cannot start or end table name with '.'", nameof(name));
             var i = name.LastIndexOf('.');
             return name.Remove(i);
+        }
+
+        public static string[] GetInherits(string line)
+        {
+            return line.Split('>')[1].Split(',');
         }
 
         public static string GetKeyName(string line)

@@ -52,6 +52,12 @@ pre-defined key will be used. That means that even though we declared "port" to 
 will use 8181. This will not affect 'server' though or any other inherited tables unless they also inherit
 from 'server.debug'.
 
+To explicitly state inheritance, put a `> %tablename%` after the table name. IE:
+```
+(server.admin) > server.mod
+```
+You can have multiple, just place a comma in between.
+
 Sec Objects
 -----------
 Objects that can be used in the config are:
